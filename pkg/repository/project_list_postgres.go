@@ -22,6 +22,8 @@ func (r *ProjectListPostgres) Create(userId int, project todo.ProjectList) (int,
 	}
 	var id int
 	createListQuery := fmt.Sprintf("INSERT INTO %s (title, directory) VALUES ($1,$2) RETURNING id", projectListTable)
+	fmt.Println(project.Title)
+	fmt.Println(project.Directory)
 	row := tx.QueryRow(createListQuery, project.Title, project.Directory)
 	if err := row.Scan(&id); err != nil {
 		tx.Rollback()
