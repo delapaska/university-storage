@@ -9,12 +9,17 @@ type Authorization interface {
 	CreateUser(todo.User) (int, error)
 	GetUser(username, password string) (todo.User, error)
 }
+type ProjectList interface {
+	Create(userId int, project todo.ProjectList) (int, error)
+}
 type Repository struct {
 	Authorization
+	ProjectList
 }
 
 func NewRepository(db *sqlx.DB) *Repository {
 	return &Repository{
 		Authorization: NewAuthPostgres(db),
+		ProjectList:   NewProjectListPostgres(db),
 	}
 }
