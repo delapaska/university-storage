@@ -10,13 +10,17 @@ type Authorization interface {
 	GenerateToken(username, password string) (string, error)
 	ParseToken(token string) (int, error)
 }
-
+type ProjectList interface {
+	Create(userId int, project todo.ProjectList) (int, error)
+}
 type Service struct {
 	Authorization
+	ProjectList
 }
 
 func NewService(repos *repository.Repository) *Service {
 	return &Service{
 		Authorization: NewAuthService(repos.Authorization),
+		ProjectList:   NewProjectListService(repos.ProjectList),
 	}
 }
