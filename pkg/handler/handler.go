@@ -22,9 +22,13 @@ func (h *Handler) InitRoutes() *gin.Engine {
 	}
 	api := router.Group("/api", h.userIdentity)
 	{
+
 		projects := api.Group("/projects")
 		{
+
 			projects.POST("/", h.createProject)
+			projects.GET("/", h.getAllLists)
+			projects.GET("/:id", h.getProjectById)
 		}
 	}
 	return router

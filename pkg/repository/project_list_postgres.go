@@ -37,3 +37,17 @@ func (r *ProjectListPostgres) Create(userId int, project todo.ProjectList) (int,
 	}
 	return id, tx.Commit()
 }
+
+func (r *ProjectListPostgres) GetAll(userId int) ([]todo.ProjectList, error) {
+	var projects []todo.ProjectList
+	query := fmt.Sprintf("SELECT tl.id, tl.title, tl.directory FROM %s tl INNER JOIN %s ul on tl.id = ul.project_id WHERE ul.user_id = $1", projectListTable, usersProjectsTable)
+	err := r.db.Select(&projects, query, userId)
+	return projects, err
+}
+
+func (r *ProjectListPostgres) GetById(userId int, listId int) (todo.ProjectList, error) {
+	var project todo.ProjectList
+	query := fmt.Sprintf("SELECT tl.id, tl.title, tl.directory FROM %s tl INNER JOIN %s ul on tl.id = ul.project_id WHERE ul.user_id = $1 AND ul.project_id = $2", projectListTable, usersProjectsTable)
+	err := r.db.Get(&project, query, userId, listId)
+	return project, err
+}

@@ -11,6 +11,8 @@ type Authorization interface {
 }
 type ProjectList interface {
 	Create(userId int, project todo.ProjectList) (int, error)
+	GetAll(userId int) ([]todo.ProjectList, error)
+	GetById(userId int, listId int) (todo.ProjectList, error)
 }
 type Repository struct {
 	Authorization
