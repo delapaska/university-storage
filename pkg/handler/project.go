@@ -44,6 +44,7 @@ func (h *Handler) getAllLists(c *gin.Context) {
 		newErrorResponse(c, http.StatusInternalServerError, err.Error())
 		return
 	}
+
 	c.JSON(http.StatusOK, getAllListsResponse{
 		Data: projects,
 	})

@@ -14,10 +14,12 @@ func NewHandler(services *service.Service) *Handler {
 }
 func (h *Handler) InitRoutes() *gin.Engine {
 	router := gin.New()
-
+	router.LoadHTMLGlob("templates/*")
 	auth := router.Group("/auth")
 	{
+		auth.GET("/sign-up", h.signUp)
 		auth.POST("/sign-up", h.signUp)
+		auth.GET("/sign-in", h.signIn)
 		auth.POST("/sign-in", h.signIn)
 	}
 	api := router.Group("/api", h.userIdentity)
@@ -27,9 +29,11 @@ func (h *Handler) InitRoutes() *gin.Engine {
 		{
 
 			projects.POST("/", h.createProject)
+
 			projects.GET("/", h.getAllLists)
 			projects.GET("/:id", h.getProjectById)
 		}
 	}
+
 	return router
 }
