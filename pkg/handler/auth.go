@@ -23,13 +23,12 @@ func (h *Handler) signUp(c *gin.Context) {
 			Name:     name,
 			Password: password,
 		}
-		/*
-			var user todo.User
-			if err := c.BindJSON(&user); err != nil {
-				newErrorResponse(c, http.StatusBadRequest, err.Error())
-				return
-			}
-		*/
+
+		var user todo.User
+		if err := c.BindJSON(&user); err != nil {
+			newErrorResponse(c, http.StatusBadRequest, err.Error())
+			return
+		}
 		_, err := h.services.Authorization.CreateUser(input)
 		if err != nil {
 			newErrorResponse(c, http.StatusInternalServerError, err.Error())
@@ -58,7 +57,7 @@ func (h *Handler) signIn(c *gin.Context) {
 	username := c.PostForm("username")
 
 	password := c.PostForm("password")
-	//var input todo.User
+	var user todo.User
 
 	input := signInInput{
 		Username: username,
@@ -66,10 +65,10 @@ func (h *Handler) signIn(c *gin.Context) {
 		Password: password,
 	}
 
-	//	if err := c.BindJSON(&input); err != nil {
-	//		newErrorResponse(c, http.StatusBadRequest, err.Error())
-	//		return
-	//	}
+	if err := c.BindJSON(&user); err != nil {
+		newErrorResponse(c, http.StatusBadRequest, err.Error())
+		return
+	}
 	token, err := h.services.Authorization.GenerateToken(input.Username, input.Password)
 	if err != nil {
 		newErrorResponse(c, http.StatusInternalServerError, err.Error())

@@ -1,1 +1,2 @@
 docker run --name=uni-db -e POSTGRES_PASSWORD='qwerty' -p 5436:5432 -d --rm postgres
+ docker exec -it c1c608b43a529db5b34e0eb704f7bdb6a3d85947eb24e17b046365da4d18dc90 /bin/bash
