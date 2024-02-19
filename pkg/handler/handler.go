@@ -27,10 +27,10 @@ func (h *Handler) InitRoutes() *gin.Engine {
 		api.GET("/main", h.loadMainPage)
 		projects := api.Group("/projects")
 		{
+			projects.GET("/create", h.createProject)
+			projects.POST("/create", h.createProject)
 
-			projects.POST("/", h.createProject)
-
-			projects.GET("/", h.getAllLists)
+			projects.GET("/list", h.getAllLists)
 			projects.GET("/:id", h.getProjectById)
 		}
 	}

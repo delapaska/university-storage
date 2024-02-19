@@ -10,16 +10,33 @@ import (
 )
 
 func (h *Handler) createProject(c *gin.Context) {
+	if c.Request.Method == "GET" {
+		c.HTML(http.StatusOK, "create.html", nil)
+		return
+	}
 	userId, err := getUserId(c)
 	fmt.Println(userId)
 	if err != nil {
 		return
 	}
-	var input todo.ProjectList
-	if err := c.BindJSON(&input); err != nil {
-		newErrorResponse(c, http.StatusBadRequest, err.Error())
-		return
+
+	directory := c.PostForm("directory")
+	title := c.PostForm("title")
+
+	//var input todo.User
+
+	input := todo.ProjectList{
+		Title:     directory,
+		Directory: title,
 	}
+	//var input todo.ProjectList
+	fmt.Println(input)
+	/*
+		if err := c.BindJSON(&input); err != nil {
+			newErrorResponse(c, http.StatusBadRequest, err.Error())
+			return
+		}
+	*/
 	id, err := h.services.ProjectList.Create(userId, input)
 	if err != nil {
 		newErrorResponse(c, http.StatusInternalServerError, err.Error())

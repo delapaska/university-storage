@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Создание проекта</title>
+</head>
+<body>
+    <h2>Создание нового проекта</h2>
+    <form id="projectForm">
+        <label for="directory">Directory:</label><br>
+        <input type="text" id="directory" name="directory" required><br><br>
+        <label for="title">Title:</label><br>
+        <input type="text" id="title" name="title" required><br><br>
+        <button type="submit" onclick="submitForm(event)">Создать проект</button>
+    </form>
+
+    <script>
+        function submitForm(event) {
+            event.preventDefault(); // Предотвращаем стандартное поведение отправки формы
+            var form = document.getElementById("projectForm");
+            var formData = new FormData(form);
+            
+            // Отправляем POST-запрос на сервер
+            fetch('/api/projects/create', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => {
+                if (response.ok) {
+                    // Если запрос успешен, вы можете выполнить дополнительные действия здесь
+                    console.log("Проект успешно создан!");
+                    // Перенаправление на другую страницу, если необходимо
+                    window.location.href = "/api/main";
+                } else {
+                    throw new Error('Произошла ошибка при создании проекта.');
+                }
+            })
+            .catch(error => {
+                console.error('Ошибка:', error);
+                alert('Произошла ошибка при создании проекта. Пожалуйста, попробуйте снова.');
+            });
+        }
+    </script>
+</body>
+</html>
