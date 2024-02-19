@@ -24,7 +24,7 @@ func (h *Handler) InitRoutes() *gin.Engine {
 	}
 	api := router.Group("/api", h.userIdentity)
 	{
-
+		api.GET("/main", h.loadMainPage)
 		projects := api.Group("/projects")
 		{
 

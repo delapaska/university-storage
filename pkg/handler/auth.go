@@ -7,6 +7,8 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
+var Token string
+
 func (h *Handler) signUp(c *gin.Context) {
 	if c.Request.Method == "GET" {
 		c.HTML(http.StatusOK, "sign_up.html", nil)
@@ -23,12 +25,13 @@ func (h *Handler) signUp(c *gin.Context) {
 			Name:     name,
 			Password: password,
 		}
-
-		var user todo.User
-		if err := c.BindJSON(&user); err != nil {
-			newErrorResponse(c, http.StatusBadRequest, err.Error())
-			return
-		}
+		/*
+			var user todo.User
+			if err := c.BindJSON(&user); err != nil {
+				newErrorResponse(c, http.StatusBadRequest, err.Error())
+				return
+			}
+		*/
 		_, err := h.services.Authorization.CreateUser(input)
 		if err != nil {
 			newErrorResponse(c, http.StatusInternalServerError, err.Error())
@@ -57,24 +60,37 @@ func (h *Handler) signIn(c *gin.Context) {
 	username := c.PostForm("username")
 
 	password := c.PostForm("password")
-	var user todo.User
+	//var user todo.User
 
 	input := signInInput{
 		Username: username,
 
 		Password: password,
 	}
+	/*
+		if err := c.BindJSON(&user); err != nil {
+			newErrorResponse(c, http.StatusBadRequest, err.Error())
+			return
+		}
+	*/
+	Token, _ = h.services.Authorization.GenerateToken(input.Username, input.Password)
+	/*
+		if err != nil {
+			newErrorResponse(c, http.StatusInternalServerError, err.Error())
+			return
+		}
+	*/
+	c.Redirect(http.StatusSeeOther, "/api/main")
+	/*
+		c.JSON(http.StatusOK, map[string]interface{}{
+			"token": Token,
+		})
+	*/
+}
 
-	if err := c.BindJSON(&user); err != nil {
-		newErrorResponse(c, http.StatusBadRequest, err.Error())
+func (h *Handler) loadMainPage(c *gin.Context) {
+	if c.Request.Method == "GET" {
+		c.HTML(http.StatusOK, "api.html", nil)
 		return
 	}
-	token, err := h.services.Authorization.GenerateToken(input.Username, input.Password)
-	if err != nil {
-		newErrorResponse(c, http.StatusInternalServerError, err.Error())
-		return
-	}
-	c.JSON(http.StatusOK, map[string]interface{}{
-		"token": token,
-	})
 }

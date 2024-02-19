@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Мои проекты</title>
+</head>
+<body>
+    <h2>Управление проектами</h2>
+    <button onclick="redirectToMyProjects()">Мои проекты</button>
+    <button onclick="redirectToCreateProject()">Создать проект</button>
+
+    <script>
+        function redirectToMyProjects() {
+            // Редирект на страницу "Мои проекты"
+            window.location.href = "/my-projects";
+        }
+
+        function redirectToCreateProject() {
+            // Редирект на страницу "Создать проект"
+            window.location.href = "/create-project";
+        }
+    </script>
+</body>
+</html>
