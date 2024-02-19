@@ -1,6 +1,7 @@
 package handler
 
 import (
+	"fmt"
 	"net/http"
 	"strconv"
 
@@ -10,6 +11,7 @@ import (
 
 func (h *Handler) createProject(c *gin.Context) {
 	userId, err := getUserId(c)
+	fmt.Println(userId)
 	if err != nil {
 		return
 	}
@@ -35,6 +37,7 @@ type getAllListsResponse struct {
 
 func (h *Handler) getAllLists(c *gin.Context) {
 	userId, err := getUserId(c)
+	fmt.Println(userId)
 	if err != nil {
 		return
 	}
@@ -44,6 +47,7 @@ func (h *Handler) getAllLists(c *gin.Context) {
 		newErrorResponse(c, http.StatusInternalServerError, err.Error())
 		return
 	}
+
 	c.JSON(http.StatusOK, getAllListsResponse{
 		Data: projects,
 	})
