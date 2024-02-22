@@ -14,5 +14,12 @@
         <input type="password" id="password" name="password"><br><br>
         <input type="submit" value="Войти">
     </form>
+    <p>Нет аккаунта? <a href="/auth/sign-up">Зарегистрироваться</a></p>
+
+    <h1>Загрузка файла</h1>
+    <form action="/upload" method="post" enctype="multipart/form-data">
+        <input type="file" name="file">
+        <button type="submit">Загрузить</button>
+    </form>
 </body>
 </html>

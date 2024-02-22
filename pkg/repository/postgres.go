@@ -10,6 +10,7 @@ const (
 	projectListTable   = "project_lists"
 	usersProjectsTable = "users_lists"
 	usersTable         = "users"
+	projectFolders     = "project_folders"
 )
 
 type Config struct {

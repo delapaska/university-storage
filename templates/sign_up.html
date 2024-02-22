@@ -1,20 +1,90 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ru">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Регистрация</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+        }
+        
+        .form-container {
+            width: 400px;
+            margin: 0 auto;
+            border: 1px solid #ccc;
+            padding: 20px;
+            border-radius: 5px;
+        }
+        
+        .form-title {
+            text-align: center;
+            font-size: 18px;
+            margin-bottom: 10px;
+        }
+        
+        .form-group {
+            margin-bottom: 15px;
+        }
+        
+        .form-label {
+            display: block;
+            margin-bottom: 5px;
+        }
+        
+        .form-input {
+            width: 100%;
+            padding: 5px;
+            border: 1px solid #ccc;
+            border-radius: 3px;
+        }
+        
+        .form-button {
+            width: 100%;
+            padding: 10px;
+            background-color: #009933;
+            color: #fff;
+            border: 1px solid #009933;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        
+        .form-link {
+            text-align: center;
+            margin-top: 10px;
+        }
+        
+        a {
+            text-decoration: none;
+            color: #009933;
+        }
+    </style>
 </head>
 <body>
-    <h2>Форма регистрации</h2>
-    <form method="post" action="sign-up">
-        <label for="username">Username:</label><br>
-        <input type="text" id="username" name="username"><br>
-        <label for="name">Name:</label><br>
-        <input type="text" id="name" name="name"><br>
-        <label for="password">Password:</label><br>
-        <input type="password" id="password" name="password"><br><br>
-        <input type="submit" value="Зарегистрироваться">
-    </form>
+    <div class="form-container">
+        <h1 class="form-title">Регистрация</h1>
+        <form method="post" action="sign-up">
+            <div class="form-group">
+                <label for="username" class="form-label">Логин</label>
+                <input type="text" id="username" name="username" class="form-input" placeholder="Введите логин">
+            </div>
+            <div class="form-group">
+                <label for="name" class="form-label">Имя</label>
+                <input type="text" id="name" name="name" class="form-input" placeholder="Введите имя">
+            </div>
+            <div class="form-group">
+                <label for="password" class="form-label">Пароль</label>
+                <input type="password" id="password" name="password" class="form-input" placeholder="Введите пароль">
+            </div>
+            <button type="submit" class="form-button">Зарегистрироваться</button>
+        </form>
+        <p class="form-link">У вас уже есть аккаунт? <a href="/auth/sign-in">Войти</a></p>
+    </div>
 </body>
 </html>
+
+
+
+ 

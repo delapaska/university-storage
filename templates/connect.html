@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>Подключение к проекту</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css">
+</head>
+<body>
+
+<div class="container">
+    <h2>Подключение к проекту</h2>
+    <form action="/api/connect" method="post">
+        <div class="form-group">
+            <label for="token">Токен доступа:</label>
+            <input type="text" class="form-control" id="token" name="token" required>
+            <label for="id">Id проекта:</label>
+            <input type="text" class="form-control" id="id" name="id" required>
+        </div>
+        <button type="submit" class="btn btn-primary">Подключиться</button>
+    </form>
+</div>
+
+<script src="https://code.jquery.com/jquery-3.2.1.slim.min.js"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"></script>
+
+</body>
+</html>

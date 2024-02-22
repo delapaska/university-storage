@@ -1,6 +1,8 @@
 package handler
 
 import (
+	"net/http"
+
 	"github.com/delapaska/university-storage/pkg/service"
 	"github.com/gin-gonic/gin"
 )
@@ -15,6 +17,26 @@ func NewHandler(services *service.Service) *Handler {
 func (h *Handler) InitRoutes() *gin.Engine {
 	router := gin.New()
 	router.LoadHTMLGlob("templates/*")
+	router.POST("/upload", func(c *gin.Context) {
+		// Получение файла из формы
+		file, err := c.FormFile("file")
+		if err != nil {
+			c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+			return
+		}
+
+		// Сохранение файла на сервере
+		filename := file.Filename
+		err = c.SaveUploadedFile(file, "./uploads/"+filename)
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+			return
+		}
+
+		// Ответ с сообщением об успешной загрузке
+		c.JSON(http.StatusOK, gin.H{"message": "File uploaded successfully!"})
+	})
+
 	auth := router.Group("/auth")
 	{
 		auth.GET("/sign-up", h.signUp)
@@ -24,6 +46,8 @@ func (h *Handler) InitRoutes() *gin.Engine {
 	}
 	api := router.Group("/api", h.userIdentity)
 	{
+		api.GET("/connect", h.connectToProject)
+		api.POST("/connect", h.connectToProject)
 		api.GET("/main", h.loadMainPage)
 		projects := api.Group("/projects")
 		{
@@ -31,7 +55,10 @@ func (h *Handler) InitRoutes() *gin.Engine {
 			projects.POST("/create", h.createProject)
 
 			projects.GET("/list", h.getAllLists)
-			projects.GET("/:id", h.getProjectById)
+			projects.GET("/list/:id", h.getProjectById)
+			projects.POST("/list/:id/upload", h.uploadFiles)
+			projects.POST("list/:id/create-folder", h.createFolder)
+			projects.GET("/list/:id/connect", h.connectProject)
 		}
 	}
 

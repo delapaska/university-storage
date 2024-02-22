@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <title>Проект №{{ .Id }}</title>
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css">
+</head>
+<body>
+
+<h1>{{ .Title }}</h1>
+
+<button type="button" class="btn btn-primary" data-toggle="modal" data-target="#createFolderModal">
+  Создать папку
+</button>
+
+<div class="modal fade" id="createFolderModal" tabindex="-1" role="dialog" aria-labelledby="createFolderModalLabel" aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="createFolderModalLabel">Создание папки</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <form action="/api/projects/list/{{ .Id }}/create-folder" method="post">
+          <input type="hidden" name="project_id" value="{{ .Id }}">
+          <div class="form-group">
+            <label for="folderName">Название папки</label>
+            <input type="text" class="form-control" id="folderName" name="folder_name" required>
+          </div>
+          <button type="submit" class="btn btn-primary">Создать</button>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="container mt-4">
+  <h2>Список папок</h2>
+  <ul class="list-group" id="foldersList">
+    {{ range .Folders }}
+      <li class="list-group-item">
+        <div class="d-flex justify-content-between align-items-center">
+          <span class="folderName">{{ . }}</span>
+          <button class="btn btn-success addFileBtn">+</button>
+          <input type="file" class="fileInput" style="display: none;" multiple>
+          <button class="btn btn-primary showFilesBtn">↓</button>
+        </div>
+        <ul class="list-group fileList" style="display: none;">
+          <!-- Список файлов будет здесь -->
+        </ul>
+      </li>
+    {{ end }}
+  </ul>
+</div>
+
+<script src="https://code.jquery.com/jquery-3.2.1.slim.min.js"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"></script>
+<script>
+  $(document).ready(function() {
+    $(".addFileBtn").click(function() {
+      $(this).next(".fileInput").click();
+    });
+
+    $(".fileInput").change(function() {
+      var fileList = $(this).closest(".list-group-item").find(".fileList");
+      var files = this.files;
+      for (var i = 0; i < Math.min(files.length, 10); i++) {
+        var fileItem = "<li class='list-group-item'>" + files[i].name + " (<a href='#' class='downloadFileLink'>Скачать</a>)</li>";
+        fileList.append(fileItem);
+      }
+      fileList.show();
+      this.value = ""; // Сбросить выбранные файлы, чтобы можно было выбрать те же файлы снова
+      // Сохранение списка файлов в локальное хранилище браузера
+      localStorage.setItem("files_" + $(this).closest(".list-group-item").index(), fileList.html());
+    });
+
+    $(".showFilesBtn").click(function() {
+      var fileList = $(this).closest(".list-group-item").find(".fileList");
+      fileList.toggle();
+    });
+
+    // Обработчик для скачивания файлов
+    $(".fileList").on("click", ".downloadFileLink", function(e) {
+      e.preventDefault();
+      var fileName = $(this).closest(".list-group-item").text().trim().split("(")[0].trim();
+      // Здесь можно добавить логику для скачивания файла с сервера
+      console.log("Скачивание файла:", fileName);
+    });
+
+    // Восстановление списка файлов из локального хранилища
+    $("#foldersList .list-group-item").each(function(index) {
+      var storedFiles = localStorage.getItem("files_" + index);
+      if (storedFiles) {
+        $(this).find(".fileList").html(storedFiles);
+      }
+    });
+  });
+</script>
+
+</body>
+</html>
