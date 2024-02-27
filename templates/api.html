@@ -3,23 +3,123 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Мои проекты</title>
+    <title>Document Management</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.3/dist/tailwind.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Roboto', sans-serif;
+        }
+    </style>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
 </head>
-<body>
-    <h2>Управление проектами</h2>
-    <button onclick="redirectToMyProjects()">Мои проекты</button>
-    <button onclick="redirectToCreateProject()">Создать проект</button>
+<body class="bg-gray-200">
+    <div class="flex">
+        <!-- Sidebar -->
+        <div class="w-1/5 bg-white min-h-screen p-5">
+            <div class="text-lg font-semibold mb-8">All Files</div>
+            <nav>
+                <a href="#" class="flex items-center mb-2 text-gray-600 hover:text-gray-900">
+                    <i class="fas fa-folder mr-2"></i> Projects
+                </a>
+                <!-- Другие ссылки на проекты -->
+            </nav>
+        </div>
+        <!-- Main content -->
+        <div class="w-4/5 p-8">
+            <!-- Top bar -->
+            <div class="flex justify-between items-center mb-10">
+                <div class="flex">
+                    <i class="fas fa-search text-gray-500 mr-3"></i>
+                    <input class="border px-2 py-1" type="text" placeholder="Search files">
+                </div>
+                <div class="flex items-center">
+                    <span class="mr-2">Andrey</span>
+                    <i class="far fa-user-circle text-3xl"></i>
+                </div>
+            </div>
+            
+            <!-- Projects section -->
+            <div class="mb-8">
+                <div class="text-lg font-semibold mb-3">Projects</div>
+                <ul id="projectList">
+                    <!-- Список проектов будет сгенерирован с помощью JavaScript -->
+                </ul>
+                <button onclick="showCreateProjectModal()" class="px-4 py-2 bg-indigo-500 text-white rounded">Create Project</button>
+            </div>
+            
+            <!-- File upload area -->
+            <div class="border-dotted border-4 border-gray-400 p-10 text-center mb-8">
+                <i class="far fa-file-alt text-5xl text-gray-500 mb-3"></i>
+                <p class="text-gray-500">Click to upload files</p>
+            </div>
+            
+            <!-- File information footer -->
+            <div class="bg-white p-5">
+                <div class="flex justify-between">
+                    <span>File name</span>
+                    <span>Last modified</span>
+                    <span>File size</span>
+                </div>
+                <!-- Дополнительная информация о файлах -->
+            </div>
+            
+            <!-- Секция для отображения имени созданного проекта -->
+            <div id="createdProjectSection" class="hidden bg-white p-5 mt-5">
+                <div class="text-lg font-semibold mb-3">Created Project</div>
+                <div id="createdProjectName" class="text-gray-800"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Модальное окно для создания проекта -->
+    <div id="createProjectModal" class="fixed top-0 left-0 w-full h-full bg-gray-800 bg-opacity-50 hidden justify-center items-center">
+        <div class="bg-white p-8 rounded-lg">
+            <h2 class="text-lg font-semibold mb-4">Enter Project Name</h2>
+            <input id="projectNameInput" type="text" class="border border-gray-300 rounded-md px-3 py-2 w-full mb-4" placeholder="Project Name">
+            <div class="flex justify-end">
+                <button onclick="createProject()" class="px-4 py-2 bg-indigo-500 text-white rounded">Create</button>
+                <button onclick="hideCreateProjectModal()" class="px-4 py-2 bg-gray-400 text-white rounded ml-2">Cancel</button>
+            </div>
+        </div>
+    </div>
 
     <script>
-        function redirectToMyProjects() {
-            // Редирект на страницу "Мои проекты"
-            window.location.href = "/api/projects/list";
+        function showCreateProjectModal() {
+            document.getElementById('createProjectModal').classList.remove('hidden');
         }
 
-        function redirectToCreateProject() {
-            // Редирект на страницу "Создать проект"
-            window.location.href = "/api/projects/create";
+        function hideCreateProjectModal() {
+            document.getElementById('createProjectModal').classList.add('hidden');
         }
+
+        function createProject() {
+            var projectName = document.getElementById('projectNameInput').value;
+            // Отправка POST-запроса на сервер на языке Go
+            fetch('/api/projects/create', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ projectName: projectName }),
+            })
+            .then(response => {
+                if (response.ok) {
+                    // Если запрос выполнен успешно, выводим имя проекта на странице
+                    document.getElementById('createdProjectName').innerText = projectName;
+                    document.getElementById('createdProjectSection').classList.remove('hidden');
+                    // Можно также выполнить дополнительные действия, например, скрыть модальное окно
+                    hideCreateProjectModal();
+                } else {
+                    console.error('Failed to create project');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+            });
+        }
+        
     </script>
+    
 </body>
 </html>

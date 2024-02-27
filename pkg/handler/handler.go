@@ -1,8 +1,6 @@
 package handler
 
 import (
-	"net/http"
-
 	"github.com/delapaska/university-storage/pkg/service"
 	"github.com/gin-gonic/gin"
 )
@@ -17,25 +15,6 @@ func NewHandler(services *service.Service) *Handler {
 func (h *Handler) InitRoutes() *gin.Engine {
 	router := gin.New()
 	router.LoadHTMLGlob("templates/*")
-	router.POST("/upload", func(c *gin.Context) {
-		// Получение файла из формы
-		file, err := c.FormFile("file")
-		if err != nil {
-			c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
-			return
-		}
-
-		// Сохранение файла на сервере
-		filename := file.Filename
-		err = c.SaveUploadedFile(file, "./uploads/"+filename)
-		if err != nil {
-			c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
-			return
-		}
-
-		// Ответ с сообщением об успешной загрузке
-		c.JSON(http.StatusOK, gin.H{"message": "File uploaded successfully!"})
-	})
 
 	auth := router.Group("/auth")
 	{

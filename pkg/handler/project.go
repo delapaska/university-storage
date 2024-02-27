@@ -10,23 +10,34 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
+type CreateProjectRequest struct {
+	ProjectName string `json:"projectName"`
+}
+
 func (h *Handler) createProject(c *gin.Context) {
 	if c.Request.Method == "GET" {
 		c.HTML(http.StatusOK, "create.html", nil)
 		return
 	}
+	var reqBody CreateProjectRequest
+	if err := c.BindJSON(&reqBody); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Failed to decode request body"})
+		return
+	}
+
+	// Выводим введенное имя проекта в консоль
+	projectName := reqBody.ProjectName
+	println("Received project name:", projectName)
 	userId, err := getUserId(c)
 	fmt.Println(userId)
 	if err != nil {
 		return
 	}
 
-	title := c.PostForm("title")
-
 	//var input todo.User
 
 	input := todo.ProjectList{
-		Title: title,
+		Title: projectName,
 	}
 	//var input todo.ProjectList
 	fmt.Println(input)
