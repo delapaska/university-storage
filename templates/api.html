@@ -54,72 +54,79 @@
                 <p class="text-gray-500">Click to upload files</p>
             </div>
             
-            <!-- File information footer -->
             <div class="bg-white p-5">
-                <div class="flex justify-between">
+                <div class="flex justify-between mb-3">
                     <span>File name</span>
                     <span>Last modified</span>
                     <span>File size</span>
                 </div>
-                <!-- Дополнительная информация о файлах -->
+                <div id="projectListContainer">
+                    <!-- Здесь будет список проектов -->
+                </div>
             </div>
-            
-            <!-- Секция для отображения имени созданного проекта -->
-            <div id="createdProjectSection" class="hidden bg-white p-5 mt-5">
-                <div class="text-lg font-semibold mb-3">Created Project</div>
-                <div id="createdProjectName" class="text-gray-800"></div>
-            </div>
+<!-- Модальное окно для создания проекта -->
+<div id="createProjectModal" class="fixed top-0 left-0 w-full h-full bg-gray-800 bg-opacity-50 hidden justify-center items-center">
+    <div class="bg-white p-8 rounded-lg">
+        <h2 class="text-lg font-semibold mb-4">Enter Project Name</h2>
+        <input id="projectNameInput" type="text" class="border border-gray-300 rounded-md px-3 py-2 w-full mb-4" placeholder="Project Name">
+        <div class="flex justify-end">
+            <button onclick="createProject()" class="px-4 py-2 bg-indigo-500 text-white rounded">Create</button>
+            <button onclick="hideCreateProjectModal()" class="px-4 py-2 bg-gray-400 text-white rounded ml-2">Cancel</button>
         </div>
     </div>
+</div>
 
-    <!-- Модальное окно для создания проекта -->
-    <div id="createProjectModal" class="fixed top-0 left-0 w-full h-full bg-gray-800 bg-opacity-50 hidden justify-center items-center">
-        <div class="bg-white p-8 rounded-lg">
-            <h2 class="text-lg font-semibold mb-4">Enter Project Name</h2>
-            <input id="projectNameInput" type="text" class="border border-gray-300 rounded-md px-3 py-2 w-full mb-4" placeholder="Project Name">
-            <div class="flex justify-end">
-                <button onclick="createProject()" class="px-4 py-2 bg-indigo-500 text-white rounded">Create</button>
-                <button onclick="hideCreateProjectModal()" class="px-4 py-2 bg-gray-400 text-white rounded ml-2">Cancel</button>
-            </div>
-        </div>
-    </div>
+<script>
+    function showCreateProjectModal() {
+        document.getElementById('createProjectModal').classList.remove('hidden');
+    }
 
-    <script>
-        function showCreateProjectModal() {
-            document.getElementById('createProjectModal').classList.remove('hidden');
-        }
+    function hideCreateProjectModal() {
+        document.getElementById('createProjectModal').classList.add('hidden');
+    }
 
-        function hideCreateProjectModal() {
-            document.getElementById('createProjectModal').classList.add('hidden');
-        }
+    function createProject() {
+        var projectName = document.getElementById('projectNameInput').value;
+        fetch('/api/projects/create', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ projectName: projectName }),
+        })
+        .then(response => {
+            if (response.ok) {
+                // Обновляем список проектов
+                updateProjectList();
+                // Можно также выполнить дополнительные действия, например, скрыть модальное окно
+                hideCreateProjectModal();
+            } else {
+                console.error('Failed to create project');
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+        });
+    }
 
-        function createProject() {
-            var projectName = document.getElementById('projectNameInput').value;
-            // Отправка POST-запроса на сервер на языке Go
-            fetch('/api/projects/create', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({ projectName: projectName }),
-            })
-            .then(response => {
-                if (response.ok) {
-                    // Если запрос выполнен успешно, выводим имя проекта на странице
-                    document.getElementById('createdProjectName').innerText = projectName;
-                    document.getElementById('createdProjectSection').classList.remove('hidden');
-                    // Можно также выполнить дополнительные действия, например, скрыть модальное окно
-                    hideCreateProjectModal();
-                } else {
-                    console.error('Failed to create project');
-                }
-            })
-            .catch(error => {
-                console.error('Error:', error);
-            });
-        }
-        
-    </script>
+    function updateProjectList() {
+        fetch('/api/projects/list', {
+            method: 'GET',
+        })
+        .then(response => response.text())
+        .then(data => {
+            // Заменяем содержимое списка проектов на странице полученными данными
+            document.getElementById('projectListContainer').innerHTML = data;
+        })
+        .catch(error => {
+            console.error('Error:', error);
+        });
+    }
+
+    // Вызываем функцию обновления списка проектов при загрузке страницы
+    window.onload = updateProjectList;
+</script>
+
     
 </body>
 </html>

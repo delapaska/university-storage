@@ -2,7 +2,10 @@ package handler
 
 import (
 	"fmt"
+	"io"
 	"net/http"
+	"os"
+	"path/filepath"
 	"strconv"
 	"strings"
 
@@ -110,7 +113,8 @@ func (h *Handler) getProjectById(c *gin.Context) {
 		// Обработка ошибки, если не удалось получить идентификатор пользователя
 		return
 	}
-
+	files, _ := listFiles("./uploads")
+	fmt.Println(files)
 	// Получаем идентификатор проекта из URL-параметра запроса
 	id, err := strconv.Atoi(c.Param("id"))
 	if err != nil {
@@ -137,12 +141,28 @@ func (h *Handler) getProjectById(c *gin.Context) {
 
 	// Отображение HTML страницы с информацией о проекте и списком папок
 	c.HTML(http.StatusOK, "project.html", gin.H{
+		"files":   files,
 		"Id":      project.Id,
 		"Title":   project.Title,
 		"Folders": folders,
 	})
 }
-
+func listFiles(directory string) ([]string, error) {
+	var files []string
+	err := filepath.Walk(directory, func(path string, info os.FileInfo, err error) error {
+		if err != nil {
+			return err
+		}
+		if !info.IsDir() {
+			files = append(files, filepath.Base(path))
+		}
+		return nil
+	})
+	if err != nil {
+		return nil, err
+	}
+	return files, nil
+}
 func (h *Handler) createFolder(c *gin.Context) {
 
 	id, _ := strconv.Atoi(c.Param("id"))
@@ -155,7 +175,32 @@ func (h *Handler) createFolder(c *gin.Context) {
 }
 
 func (h *Handler) uploadFiles(c *gin.Context) {
+	file, header, err := c.Request.FormFile("file")
+	if err != nil {
+		c.String(http.StatusBadRequest, fmt.Sprintf("file err: %s", err.Error()))
+		return
+	}
+	filename := header.Filename
+	filename = strings.ReplaceAll(filename, " ", "_") // Заменяем пробелы в имени файла на нижнее подчеркивание
+	out, err := os.Create(filepath.Join("./uploads", filename))
+	if err != nil {
+		c.String(http.StatusBadRequest, fmt.Sprintf("file err: %s", err.Error()))
+		return
+	}
+	defer out.Close()
+	_, err = io.Copy(out, file)
+	if err != nil {
+		c.String(http.StatusBadRequest, fmt.Sprintf("file err: %s", err.Error()))
+		return
+	}
 
+	_, err = db.Exec("INSERT INTO files (folder_id, filename, filepath) VALUES ($1, $2, $3)", 1, filename, filename)
+	if err != nil {
+		c.String(http.StatusInternalServerError, fmt.Sprintf("error inserting file into database: %s", err.Error()))
+		return
+	}
+	link := "/api/projects/list/" + strconv.Itoa(id)
+	c.Redirect(http.StatusFound, link)
 }
 func (h *Handler) connectProject(c *gin.Context) {
 	projectId := c.Param("id")

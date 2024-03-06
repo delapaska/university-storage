@@ -33,3 +33,11 @@ CREATE TABLE project_tokens
     token       varchar(255) not null unique,
     created_at  timestamp    not null default now()
 );
+
+CREATE TABLE files
+(
+    id          serial       not null unique,
+    folder_id   int          not null references project_folders (id) on delete cascade,
+    filename    varchar(255) not null,
+    filepath    varchar(255) not null
+);

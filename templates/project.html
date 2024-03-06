@@ -43,60 +43,84 @@
       <li class="list-group-item">
         <div class="d-flex justify-content-between align-items-center">
           <span class="folderName">{{ . }}</span>
-          <button class="btn btn-success addFileBtn">+</button>
-          <input type="file" class="fileInput" style="display: none;" multiple>
-          <button class="btn btn-primary showFilesBtn">↓</button>
+          <button type="button" class="btn btn-success btn-sm" onclick="uploadFile('{{ . }}')">+</button>
+          
         </div>
-        <ul class="list-group fileList" style="display: none;">
-          <!-- Список файлов будет здесь -->
-        </ul>
+        <div class="fileList" id="{{ . }}"></div>
       </li>
     {{ end }}
   </ul>
 </div>
 
+<div class="modal fade" id="uploadFileModal" tabindex="-1" role="dialog" aria-labelledby="uploadFileModalLabel" aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="uploadFileModalLabel">Загрузка файла</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      
+      <div class="modal-body">
+        <form id="uploadForm" enctype="multipart/form-data" action="/api/projects/list/{{ .Id }}/upload" method="post">
+          <input type="file" name="file" id="fileInput" required>
+          <input type="hidden" id="uploadFolder" name="folder">
+          <button type="submit" class="btn btn-primary mt-2">Загрузить</button>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
 <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js"></script>
 <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"></script>
+
 <script>
   $(document).ready(function() {
-    $(".addFileBtn").click(function() {
-      $(this).next(".fileInput").click();
+    // Функция для загрузки файлов для указанной папки
+    function loadFiles(folderName) {
+      $.get("/api/projects/list/{{ .Id }}/files?folder=" + folderName, function(data) {
+        var fileList = $("#" + folderName);
+        fileList.empty();
+        $.each(data, function(index, file) {
+          fileList.append("<p>" + file + "</p>");
+        });
+      });
+    }
+
+    // При загрузке страницы загружаем файлы для всех папок
+    $.each($(".folderName"), function(index, folder) {
+      loadFiles($(folder).text());
     });
 
-    $(".fileInput").change(function() {
-      var fileList = $(this).closest(".list-group-item").find(".fileList");
-      var files = this.files;
-      for (var i = 0; i < Math.min(files.length, 10); i++) {
-        var fileItem = "<li class='list-group-item'>" + files[i].name + " (<a href='#' class='downloadFileLink'>Скачать</a>)</li>";
-        fileList.append(fileItem);
-      }
-      fileList.show();
-      this.value = ""; // Сбросить выбранные файлы, чтобы можно было выбрать те же файлы снова
-      // Сохранение списка файлов в локальное хранилище браузера
-      localStorage.setItem("files_" + $(this).closest(".list-group-item").index(), fileList.html());
-    });
-
-    $(".showFilesBtn").click(function() {
-      var fileList = $(this).closest(".list-group-item").find(".fileList");
-      fileList.toggle();
-    });
-
-    // Обработчик для скачивания файлов
-    $(".fileList").on("click", ".downloadFileLink", function(e) {
-      e.preventDefault();
-      var fileName = $(this).closest(".list-group-item").text().trim().split("(")[0].trim();
-      // Здесь можно добавить логику для скачивания файла с сервера
-      console.log("Скачивание файла:", fileName);
-    });
-
-    // Восстановление списка файлов из локального хранилища
-    $("#foldersList .list-group-item").each(function(index) {
-      var storedFiles = localStorage.getItem("files_" + index);
-      if (storedFiles) {
-        $(this).find(".fileList").html(storedFiles);
-      }
+    // Обработка отправки файла на сервер
+    $("#uploadForm").submit(function(event) {
+      event.preventDefault();
+      var formData = new FormData(this);
+      $.ajax({
+        url: $(this).attr("action"),
+        type: "POST",
+        data: formData,
+        success: function(response) {
+          // После успешной загрузки файла перезагружаем файлы для соответствующей папки
+          var folderName = $("#uploadFolder").val();
+          loadFiles(folderName);
+        },
+        error: function(xhr, status, error) {
+          console.error(xhr.responseText);
+        },
+        cache: false,
+        contentType: false,
+        processData: false
+      });
     });
   });
+
+  function uploadFile(folderName) {
+    $('#uploadFileModal').modal('show');
+    $('#uploadFolder').val(folderName);
+  }
 </script>
 
 </body>

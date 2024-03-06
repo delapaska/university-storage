@@ -1,6 +1,8 @@
 package handler
 
 import (
+	"net/http"
+
 	"github.com/delapaska/university-storage/pkg/service"
 	"github.com/gin-gonic/gin"
 )
@@ -15,7 +17,7 @@ func NewHandler(services *service.Service) *Handler {
 func (h *Handler) InitRoutes() *gin.Engine {
 	router := gin.New()
 	router.LoadHTMLGlob("templates/*")
-
+	router.StaticFS("/files", http.Dir("./uploads"))
 	auth := router.Group("/auth")
 	{
 		auth.GET("/sign-up", h.signUp)
